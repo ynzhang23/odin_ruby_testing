@@ -130,17 +130,37 @@ describe BinaryGame do
 
     context 'when user inputs an incorrect value once, then a valid input' do
       before do
+        invalid_symbol_input = '*'
+        valid_input = '3'
+        allow(game_input).to receive(:gets).and_return(invalid_symbol_input, valid_input)
       end
 
-      xit 'completes loop and displays error message once' do
+      it 'completes loop and displays error message once' do
+        min = game_input.instance_variable_get(:@minimum)
+        max = game_input.instance_variable_get(:@maximum)
+        error_message = "Input error! Please enter a number between #{min} or #{max}."
+        expect(game_input).to receive(:puts).with(error_message)
+        game_input.player_input(min, max)
+        expect(game_input).not_to receive(:puts).with(error_message)
+        game_input.player_input(min, max)
       end
     end
 
     context 'when user inputs two incorrect values, then a valid input' do
       before do
+        invalid_symbol_input = '*'
+        invalid_number_input = '11'
+        valid_input = '3'
+        allow(game_input).to receive(:gets).and_return(invalid_symbol_input, invalid_number_input, valid_input)
       end
 
-      xit 'completes loop and displays error message twice' do
+      it 'completes loop and displays error message twice' do
+        min = game_input.instance_variable_get(:@minimum)
+        max = game_input.instance_variable_get(:@maximum)
+        error_message = "Input error! Please enter a number between #{min} or #{max}."
+        expect(game_input).to receive(:puts).with(error_message).twice
+        expect(game_input).not_to receive(:puts).with(error_message)
+        3.times { game_input.player_input(min, max) }
       end
     end
   end
