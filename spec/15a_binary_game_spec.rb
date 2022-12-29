@@ -166,22 +166,31 @@ describe BinaryGame do
   end
 
   # ASSIGNMENT #2
-
   # Create a new instance of BinaryGame and write a test for the following two
   # context blocks.
+  subject(:verify_input_test) { described_class.new(1, 10) }
   describe '#verify_input' do
     # Located inside #play_game (Looping Script Method)
     # Query Method -> Test the return value
-
     # Note: #verify_input will only return a number if it is between?(min, max)
 
     context 'when given a valid input as argument' do
-      xit 'returns valid input' do
+      let(:valid_input) { 5 }
+      it 'returns valid input' do
+        min = verify_input_test.instance_variable_get(:@minimum)
+        max = verify_input_test.instance_variable_get(:@maximum)
+        result = verify_input_test.verify_input(min, max, valid_input)
+        expect(result).to eql(5)
       end
     end
 
     context 'when given invalid input as argument' do
-      xit 'returns nil' do
+      let(:invalid_input) { '11' }
+      it 'returns nil' do
+        min = verify_input_test.instance_variable_get(:@minimum)
+        max = verify_input_test.instance_variable_get(:@maximum)
+        result = verify_input_test.verify_input(min, max, invalid_input.to_i)
+        expect(result).to be_nil
       end
     end
   end
@@ -189,7 +198,6 @@ describe BinaryGame do
   describe '#update_random_number' do
     # Located inside #play_game (Public Script Method)
     # Method with Outgoing Command -> Test that a message is sent
-
     # Look at the #update_random_number in the BinaryGame class. This method
     # gets the user's input & wants to update the value of the @random_number.
     # If the RandomNumber class had a public setter method (like attr_accessor)
@@ -273,7 +281,10 @@ describe BinaryGame do
 
     # Write a test for the following context.
     context 'when game minimum and maximum is 100 and 600' do
-      xit 'returns 9' do
+      subject(:game_100_600) { described_class.new(100, 600) }
+      it 'returns 9' do
+        max = game_100_600.maximum_guesses
+        expect(max).to eq(9)
       end
     end
   end
@@ -331,7 +342,13 @@ describe BinaryGame do
 
     # Write a test for the following context.
     context 'when game_over? is false five times' do
-      xit 'calls display_turn_order five times' do
+      before do
+        allow(search_display).to receive(:game_over?).and_return(false, false, false, false, false, true)
+      end
+
+      it 'calls display_turn_order five times' do
+        expect(game_display).to receive(:display_turn_order).with(search_display).exactly(5).times
+        game_display.display_binary_search(search_display)
       end
     end
   end
@@ -344,21 +361,31 @@ describe BinaryGame do
     # #display_turn_order will loop until binary_search.game_over?
 
     # Create a new subject and an instance_double for BinarySearch.
+    subject(:loop_test) { described_class.new(1, 10) }
+    let(:loop_test_binary_search) { instance_double(BinarySearch) }
 
     before do
       # You'll need to create a few method stubs.
+      allow(loop_test_binary_search).to receive(:update_range)
+      allow(loop_test_binary_search).to receive(:make_guess)
+      allow(loop_test).to receive(:display_guess)
     end
 
     # Command Method -> Test the change in the observable state
-    xit 'increases guess_count by one' do
+    it 'increases guess_count by one' do
+      expect { loop_test.display_turn_order(loop_test_binary_search) }.to change { loop_test.instance_variable_get(:@guess_count) }.by(1)
     end
 
     # Method with Outgoing Command -> Test that a message is sent
-    xit 'sends make_guess' do
+    it 'sends make_guess' do
+      expect(loop_test_binary_search).to receive(:make_guess).once
+      loop_test.display_turn_order(loop_test_binary_search)
     end
 
     # Method with Outgoing Command -> Test that a message is sent
-    xit 'sends update_range' do
+    it 'sends update_range' do
+      expect(loop_test_binary_search).to receive(:update_range).once
+      loop_test.display_turn_order(loop_test_binary_search)
     end
 
     # Using method expectations can be confusing. Stubbing the methods above
